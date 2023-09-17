@@ -1,23 +1,26 @@
 const express=require('express');
 const mongoose=require('mongoose');
 const usermodel = require('./models/user');
+require('dotenv').config();
+const PORT = process.env.PORT || 3000;
+
 const app = express();
 mongoose.connect(process.env.DB_URL,{ useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
     console.log("connected to db");
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
 
 }
 )
+
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-const User = mongoose.model('User', userSchema);
+
 app.get('/users', async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await usermodel.find();
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -33,12 +36,17 @@ app.post("/add",async(req,res)=>{
     res.json(response);
  
 })
-app.put('/users/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, age,phonenumber } = req.body;
+app.put('/users', async (req, res) => {
+     const  id  ="6506cd6e16c7bf1a8173125d";
+     const { name, age,phonenumber } ={
+      name :"jjjj",
+      age :33,
+      phonenumber: 4444444
+     };
+    
   
     try {
-      const updatedUser = await User.findByIdAndUpdate(
+      const updatedUser = await usermodel.findByIdAndUpdate(
         id,
         { name, age,phonenumber },
         { new: true }
@@ -55,11 +63,13 @@ app.put('/users/:id', async (req, res) => {
   });
   
 app.delete('/users/:id', async (req, res) => {
-    const { id } = req.params;
+console.log(req.params);
+    const id  = req.params.id;
+
   
     try {
       
-      const deletedUser = await User.findByIdAndRemove(id);
+      const deletedUser = await usermodel.findByIdAndRemove(id);
   
       if (!deletedUser) {
         return res.status(404).json({ message: 'User not found' });
